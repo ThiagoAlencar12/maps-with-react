@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useState, useContext} from 'react'
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -8,6 +8,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
 import { Card, SignInContainer } from './styles'
+import { AuthContext } from '../../../app/context/AuthProvider';
 
 export  function Login() {
   const [emailError, setEmailError] = useState(false);
@@ -15,16 +16,19 @@ export  function Login() {
   const [passwordError, setPasswordError] = useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
 
+  const [login, setLogin] = useState('')
+  const [password, setPassword] = useState('')
+
+  const { signIn } = useContext(AuthContext)
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    if (emailError || passwordError) {
-      event.preventDefault();
-      return;
-    }
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    event.preventDefault()
+ 
+    signIn({
+      login,
+      password,
+    })
+    
   };
 
   const validateInputs = () => {
@@ -92,6 +96,7 @@ export  function Login() {
                 fullWidth
                 variant="outlined"
                 color={emailError ? 'error' : 'primary'}
+                onChange={(event) => setLogin(event.target.value)}
               />
             </FormControl>
             <FormControl>
@@ -109,12 +114,13 @@ export  function Login() {
                 fullWidth
                 variant="outlined"
                 color={passwordError ? 'error' : 'primary'}
+                onChange={(event) => setPassword(event.target.value)}
               />
             </FormControl>
             <Button
               type="submit"
               fullWidth
-              
+              variant="contained"
               onClick={validateInputs}
             >
               Sign in
