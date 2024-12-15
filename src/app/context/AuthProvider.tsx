@@ -10,6 +10,8 @@ type UserCredentials = {
 type AuthContextProps = {
     signIn(credentials: UserCredentials): void
     signUp(credentials: UserCredentials): void
+    logOut(): void
+
     loggedUser?: UserCredentials
 }
 
@@ -44,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },[])
     
     function signIn({login}: UserCredentials) {
-        const findedUser = users.find((item: {login: string, password: string}) => {
+        const findedUser = users?.find((item: {login: string, password: string}) => {
             return item.login === login
         })
 
@@ -52,7 +54,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         localStorage.setItem('loggedUser', JSON.stringify(findedUser))
         navigate("/home")
-       
     }
     function signUp({login, password}: UserCredentials) {
         const newUser = { login, password, isAuthenticated }
@@ -60,8 +61,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem('users', JSON.stringify(updatedUsers))
         navigate("/")
     }
+
+    function logOut() {
+        localStorage.removeItem('loggedUser')
+        navigate('/')
+    }
     return (
-        <AuthContext.Provider value={{ signIn, signUp, loggedUser }}>
+        <AuthContext.Provider value={{ signIn, signUp, loggedUser, logOut }}>
             {children}
         </AuthContext.Provider>
     )
