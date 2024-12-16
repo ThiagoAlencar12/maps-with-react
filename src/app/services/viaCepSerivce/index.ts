@@ -16,6 +16,31 @@ export const fetchAddressByCep = async (cep: string) => {
     }
     return data; // Retorna os dados do endereço
   };
+
+  export const fetchAddressesByParams = async (uf: string, cidade: string, logradouro: string) => {
+    const formattedUf = uf.trim().toLowerCase();
+    const formattedCidade = cidade.trim().toLowerCase();
+    const formattedLogradouro = logradouro.trim().toLowerCase();
+  
+    if (!formattedUf || !formattedCidade || !formattedLogradouro) {
+      throw new Error('UF, cidade e logradouro são obrigatórios.');
+    }
+  
+    const response = await fetch(
+      `https://viacep.com.br/ws/${formattedUf}/${formattedCidade}/${formattedLogradouro}/json/`
+    );
+  
+    if (!response.ok) {
+      throw new Error('Erro ao buscar os endereços. Tente novamente.');
+    }
+  
+    const data = await response.json();
+    if (!Array.isArray(data) || data.length === 0) {
+      throw new Error('Nenhum endereço encontrado.');
+    }
+  
+    return data; // Retorna uma lista de endereços
+  };
   
 
   export const fetchGeocode = async (address: string) => {

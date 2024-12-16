@@ -8,8 +8,16 @@ import {
   Box,
   Tabs,
   Tab,
+  Checkbox,
+  Stack,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  List,
+  ListItem,
+  ListItemText,
 } from '@mui/material';
-import { fetchAddressByCep, fetchGeocode } from '../../../../../app/services/viaCepSerivce';
+import { fetchAddressByCep, fetchAddressesByParams, fetchGeocode } from '../../../../../app/services/viaCepSerivce';
 import { AuthContext } from '../../../../../app/context/AuthProvider';
 
 interface RegisterActionProp {
@@ -52,12 +60,19 @@ export const RegisterAddressForm = ({ setAddressLatAndLong }: RegisterActionProp
 
   const [error, setError] = useState<string | null>(null);
   const [addresses, setAddresses] = useState<RegisterAddressForm[]>([]);
+  const [searchResults, setSearchResults] = useState<RegisterAddressForm[]>([]);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [openDialog, setOpenDialog] = useState<boolean>()
   const { loggedUser, logOut } = useContext(AuthContext);
+
+  const [isSearchByAddress, setIsSeachByAddress] = useState(false);
+  const [isSearchByCep, setSearchByCep] = useState(false);
 
   // Estado da aba ativa
   const [activeTab, setActiveTab] = useState(0);
+
+
 
   // Carregar endereços do localStorage no carregamento inicial
   useEffect(() => {
@@ -66,6 +81,19 @@ export const RegisterAddressForm = ({ setAddressLatAndLong }: RegisterActionProp
       setAddresses(JSON.parse(savedAddresses));
     }
   }, []);
+
+
+    // Handlers para alternar os checkboxes
+    const handleFetchByAdressChange = () => {
+      setIsSeachByAddress((prevState) => !prevState);
+      setSearchByCep(false); // Desmarca o outro
+    };
+  
+    const handleCepChange = () => {
+      setIsSeachByAddress(false); // Desmarca o outro
+      setSearchByCep((prevState) => !prevState);
+    };
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -102,6 +130,31 @@ export const RegisterAddressForm = ({ setAddressLatAndLong }: RegisterActionProp
     } catch {
       setError('Erro ao buscar o CEP. Tente novamente.');
     }
+  };
+
+  const handleFetchByParams = async () => {
+    try {
+      const results = await fetchAddressesByParams(formData.uf, formData.localidade, formData.logradouro);
+      setSearchResults(results); // Armazena os resultados no estado
+      setOpenDialog(true)
+    } catch (error) {
+      console.error('Erro ao buscar endereços:', error);
+    }
+  };
+
+  const handleSelectAddress = (address: RegisterAddressForm) => {
+    // Preenche os campos do formulário com os dados do endereço selecionado
+    setFormData((prev) => ({
+      ...prev,
+      cep: address.cep,
+      logradouro: address.logradouro,
+      complemento: address.complemento || '',
+      bairro: address.bairro || '',
+      localidade: address.localidade,
+      uf: address.uf,
+    }));
+    setOpenDialog(false)
+    setSearchResults([]); // Limpa a lista de resultados após a seleção
   };
 
   const handleSaveAddress = () => {
@@ -254,6 +307,7 @@ export const RegisterAddressForm = ({ setAddressLatAndLong }: RegisterActionProp
 
           <Grid item xs={12}>
             <TextField
+              required={isSearchByCep}
               label="CEP"
               name="cep"
               variant="outlined"
@@ -263,13 +317,30 @@ export const RegisterAddressForm = ({ setAddressLatAndLong }: RegisterActionProp
               error={!!error}
               helperText={error}
             />
-            <Button variant="contained" onClick={handleCepFetch}>
-              Buscar Endereço
+            <Stack flexDirection='row' alignItems='center'>
+             <Checkbox 
+              checked={isSearchByAddress}
+              onChange={handleFetchByAdressChange}
+             />
+             <Typography>Buscar por logradouro</Typography>
+            </Stack>
+
+            <Stack flexDirection='row' alignItems='center'>
+             <Checkbox 
+               checked={isSearchByCep}
+               onChange={handleCepChange}
+             />
+             <Typography>Buscar por CEP</Typography>
+            </Stack>
+
+            <Button variant="contained" onClick={isSearchByCep ? handleCepFetch : handleFetchByParams}>
+              Buscar
             </Button>
           </Grid>
 
           <Grid item xs={12}>
             <TextField
+              required={isSearchByAddress}
               label="Logradouro"
               name="logradouro"
               variant="outlined"
@@ -303,6 +374,7 @@ export const RegisterAddressForm = ({ setAddressLatAndLong }: RegisterActionProp
 
           <Grid item xs={6}>
             <TextField
+              required={isSearchByAddress}
               label="Cidade"
               name="localidade"
               variant="outlined"
@@ -314,6 +386,8 @@ export const RegisterAddressForm = ({ setAddressLatAndLong }: RegisterActionProp
 
           <Grid item xs={6}>
             <TextField
+              required={isSearchByAddress}
+
               label="UF"
               name="uf"
               variant="outlined"
@@ -400,6 +474,41 @@ export const RegisterAddressForm = ({ setAddressLatAndLong }: RegisterActionProp
           </Grid>
         </Grid>
       )}
+
+      <Dialog
+        open={openDialog}
+      >
+        <DialogTitle>Endereços encontrados</DialogTitle>
+        <DialogContent>
+        <Grid item xs={12}>
+            <Typography variant="h6">Resultados da busca:</Typography>
+            <List
+                 sx={{
+                  width: '100%',
+                  maxWidth: 360,
+                  bgcolor: 'background.paper',
+                  position: 'relative',
+                  overflow: 'auto',
+                  maxHeight: 300,
+                  '& ul': { padding: 0 },
+                }}
+            >
+              {searchResults.map((address, index) => (
+                <ListItem
+                  key={index}
+                  button
+                  onClick={() => handleSelectAddress(address)}
+                >
+                  <ListItemText
+                    primary={`${address.logradouro}, ${address.bairro}, ${address.localidade} - ${address.uf}`}
+                    secondary={`CEP: ${address.cep}`}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </Grid>
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };
