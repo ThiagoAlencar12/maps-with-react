@@ -1,4 +1,5 @@
-import {useState} from 'react'
+import {useContext, useState} from 'react'
+import { useNavigate } from 'react-router';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -8,6 +9,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
 import { Card, SignInContainer } from './styles'
+import { AuthContext } from '../../../app/context/AuthProvider';
 
 export  function SignUp() {
   const [emailError, setEmailError] = useState(false);
@@ -15,16 +17,20 @@ export  function SignUp() {
   const [passwordError, setPasswordError] = useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
 
+  const [login, setLogin] = useState('')
+  const [password, setPassword] = useState('')
+  const { signIn, signUp } = useContext(AuthContext)
+  const navigate = useNavigate()
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     if (emailError || passwordError) {
-      event.preventDefault();
       return;
     }
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    signUp({
+      login,
+      password
+    })
+    
   };
 
   const validateInputs = () => {
@@ -64,7 +70,7 @@ export  function SignUp() {
             variant="h4"
             sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
           >
-            Login
+            SignUp
           </Typography>
           <Box
             component="form"
@@ -77,7 +83,7 @@ export  function SignUp() {
               gap: 2,
             }}
           >
-            <FormControl>
+           <FormControl>
               <FormLabel htmlFor="email">Email</FormLabel>
               <TextField
                 error={emailError}
@@ -92,6 +98,7 @@ export  function SignUp() {
                 fullWidth
                 variant="outlined"
                 color={emailError ? 'error' : 'primary'}
+                onChange={(event) => setLogin(event.target.value)}
               />
             </FormControl>
             <FormControl>
@@ -109,6 +116,7 @@ export  function SignUp() {
                 fullWidth
                 variant="outlined"
                 color={passwordError ? 'error' : 'primary'}
+                onChange={(event) => setPassword(event.target.value)}
               />
             </FormControl>
             <Button
@@ -117,7 +125,15 @@ export  function SignUp() {
               variant="contained"
               onClick={validateInputs}
             >
-              Sign in
+              Sign Up
+            </Button>
+
+            <Button
+              fullWidth
+              variant="text"
+              onClick={() => navigate("/")}
+            >
+              Return to Login
             </Button>
           </Box>
         </Card>
