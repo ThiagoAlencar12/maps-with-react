@@ -17,7 +17,9 @@ import {
   ListItem,
   ListItemText,
 } from '@mui/material';
-import { fetchAddressByCep, fetchAddressesByParams, fetchGeocode } from '../../../../../app/services/viaCepSerivce';
+import { fetchAddressByCep, fetchAddressesByParams, fetchGeocode } from '../../../../../app/services/geocodeService';
+import { cpfValidator } from '../../../../../app/services/cpfValidator';
+
 import { AuthContext } from '../../../../../app/context/AuthProvider';
 
 interface RegisterActionProp {
@@ -156,6 +158,25 @@ export const RegisterAddressForm = ({ handleAddressChange }: RegisterActionProp)
   };
 
   const handleSaveAddress = () => {
+    // Validações gerais
+    if (!formData.name || !formData.cpf || !formData.phone || !formData.cep || !formData.logradouro || !formData.bairro || !formData.localidade || !formData.uf) {
+      alert('Todos os campos obrigatórios devem ser preenchidos (exceto complemento).');
+      return;
+    }
+  
+    // Validação de CPF
+    if (!cpfValidator(formData.cpf)) {
+      alert('CPF inválido. Por favor, insira um CPF válido.');
+      return;
+    }
+  
+    // Verifica se o CPF já existe na base
+    const cpfExists = addresses.some((address) => address.cpf === formData.cpf && editingIndex === null);
+    if (cpfExists) {
+      alert('CPF já cadastrado. Por favor, insira um CPF diferente.');
+      return;
+    }
+  
     let updatedAddresses;
     if (editingIndex !== null) {
       // Atualiza o contato em edição
@@ -167,12 +188,13 @@ export const RegisterAddressForm = ({ handleAddressChange }: RegisterActionProp)
       // Adiciona um novo contato
       updatedAddresses = [...addresses, formData];
     }
-
+  
     setAddresses(updatedAddresses);
-
-    //Salva o contato editado/novo com o usuario logado
+  
+    // Salva o contato editado/novo com o usuário logado
     localStorage.setItem(`${loggedUser?.login}-addressList`, JSON.stringify(updatedAddresses));
-
+  
+    // Reseta o formulário
     setFormData({
       name: '',
       cpf: '',
@@ -186,6 +208,7 @@ export const RegisterAddressForm = ({ handleAddressChange }: RegisterActionProp)
       latitude: 0,
       longitude: 0,
     });
+  
     alert(editingIndex !== null ? 'Contato atualizado com sucesso!' : 'Contato salvo com sucesso!');
   };
 
