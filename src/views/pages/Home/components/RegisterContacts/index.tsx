@@ -52,8 +52,9 @@ export const RegisterAddressForm = ({ setAddressLatAndLong }: RegisterActionProp
 
   const [error, setError] = useState<string | null>(null);
   const [addresses, setAddresses] = useState<RegisterAddressForm[]>([]);
-  const [editingIndex, setEditingIndex] = useState<number | null>(null); // Armazena o índice do contato sendo editado
-  const { loggedUser } = useContext(AuthContext);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const { loggedUser, logOut } = useContext(AuthContext);
 
   // Estado da aba ativa
   const [activeTab, setActiveTab] = useState(0);
@@ -155,9 +156,30 @@ export const RegisterAddressForm = ({ setAddressLatAndLong }: RegisterActionProp
     });
   };
 
+  const filteredAddresses = addresses.filter(
+    (address) =>
+      address.name.toLowerCase().includes(searchTerm.toLowerCase()) || // Filtra por nome
+      address.cpf.includes(searchTerm) // Filtra por CPF
+  );
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value); // Atualiza o termo de busca
+  };
+
+  // const handleDeleteAccount = () => {
+  //   if (window.confirm('Tem certeza de que deseja excluir sua conta?')) {
+  //     deleteAccount(); // Assume que essa função está no contexto
+  //   }
+  // };
+
+  const handleLogout = () => {
+    logOut(); // Assume que essa função está no contexto
+  };
+
   return (
     <Box sx={{ width: '100%' }}>
-      {/* Abas para alternar entre Cadastro e Lista */}
+
+      {/* Abas para alternar entre Cadastro ,Lista e Configurações */}
       <Tabs
         value={activeTab}
         onChange={(e, newValue) => setActiveTab(newValue)}
@@ -166,6 +188,7 @@ export const RegisterAddressForm = ({ setAddressLatAndLong }: RegisterActionProp
       >
         <Tab label="Cadastro" />
         <Tab label="Endereços Salvos" />
+        <Tab label="Configurações" />
       </Tabs>
 
       {/* Conteúdo de Cadastro */}
@@ -297,11 +320,25 @@ export const RegisterAddressForm = ({ setAddressLatAndLong }: RegisterActionProp
           <Grid item xs={12}>
             <Typography variant="h6">Endereços Salvos</Typography>
           </Grid>
-          {addresses.map((address, index) => (
+
+          {/* Input de busca */}
+          <Grid item xs={12}>
+            <TextField
+              label="Buscar por Nome ou CPF"
+              variant="outlined"
+              fullWidth
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+          </Grid>
+
+          {/* Lista Filtrada */}
+          {filteredAddresses.map((address, index) => (
             <Grid item xs={12} key={index}>
               <Box marginY={2}>
                 <Typography>
-                  {address.name} - {address.cep} - {address.logradouro}, {address.localidade}/{address.uf}
+                  {address.name} - {address.cpf} - {address.cep} - {address.logradouro},{' '}
+                  {address.localidade}/{address.uf}
                 </Typography>
                 <Box>
                   <Button onClick={() => handleShowOnMap(address)} variant="outlined">
@@ -317,6 +354,25 @@ export const RegisterAddressForm = ({ setAddressLatAndLong }: RegisterActionProp
               </Box>
             </Grid>
           ))}
+        </Grid>
+      )}
+
+      {/* Conteúdo de Actions */}
+      {activeTab === 2 && (
+        <Grid container spacing={2} padding={2}>
+          <Grid item xs={12}>
+            <Typography variant="h6">Configurações</Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Button variant="contained" color="error" onClick={() => console.log('aqui')}>
+              Excluir Conta
+            </Button>
+          </Grid>
+          <Grid item xs={12}>
+            <Button variant="contained" color="primary" onClick={handleLogout}>
+              Logout
+            </Button>
+          </Grid>
         </Grid>
       )}
     </Box>
