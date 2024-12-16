@@ -1,50 +1,88 @@
-# React + TypeScript + Vite
+# Maps with React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a technical test showcasing a React application built with modern tools and libraries, integrating map functionality for an interactive user experience.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React**: A powerful library for building dynamic and responsive user interfaces.
+- **Vite**: A fast and modern build tool and development server.
+- **Material-UI**: For creating elegant and consistent user interfaces.
+- **Google Maps Integration**: Powered by the `@react-google-maps/api` library for displaying interactive maps.
+- **Via CEP Integration**: Consuming public API for CEP
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+### Prerequisites
 
-- Configure the top-level `parserOptions` property like this:
+Ensure you have the following installed:
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- **Node.js** (v16 or higher recommended)
+- **Yarn** or **npm** for dependency management
+- **Github CLI** for clone project
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   gh repo clone ThiagoAlencar12/maps-with-react
+   cd maps-with-react
+   ```
+
+2. Install the dependencies:
+   ```bash
+   yarn install
+   # or
+   npm install
+   ```
+
+### Running the Application
+
+To start the development server:
+```bash
+yarn dev
+# or
+npm run dev
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+Access the application in your browser at `http://localhost:3000` (default port).
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+## Project Structure
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```plaintext
+src/
+├── app/             # Application logic
+│   ├── context/     # Context providers
+│   ├── Router/      # Routing configuration
+│   └── services/    # API calls and services
+├── views/           # UI and functionalities
+│   └── pages/       # Application pages
 ```
+
+## Libraries and Tools
+
+- **React**: Frontend library for building UI components.
+- **Vite**: Modern build tool for optimized development and production workflows.
+- **Material-UI**: UI library for building accessible and customizable components.
+- **@react-google-maps/api**: A lightweight wrapper around the Google Maps JavaScript API for React integration.
+
+## Google Maps Setup
+
+1. Obtain a Google Maps API key from the [Google Cloud Console](https://console.cloud.google.com/).
+2. Create a `.env` file in the root directory and add the following:
+   ```env
+   VITE_GOOGLE_MAPS_API_KEY=your_api_key_here
+   ```
+3. Restart the development server to load the new environment variables.
+
+## Contact
+
+For any inquiries, reach out to the project maintainer at [Email](thiagofalencar12@gmail.com).
+
+## Exemples
+![alt text](image.png)
+
+![alt text](image-1.png)
+
+![alt text](image-2.png)
+
+![alt text](image-3.png)
