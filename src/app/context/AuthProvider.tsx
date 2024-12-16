@@ -11,6 +11,7 @@ type AuthContextProps = {
     signIn(credentials: UserCredentials): void
     signUp(credentials: UserCredentials): void
     logOut(): void
+    deleteAccount(): void
 
     loggedUser?: UserCredentials
 }
@@ -67,8 +68,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem('loggedUser')
         navigate('/')
     }
+
+    function deleteAccount() {
+         // Confirmação antes de deletar
+    if (window.confirm('Tem certeza de que deseja excluir sua conta?')) {
+        // Obter lista de usuários do localStorage
+        const usersData = localStorage.getItem('users');
+        const locationsData = localStorage.getItem(`${loggedUser?.login}-addressList`)
+        //Removendo localizações caso exista
+        if (locationsData) {
+          const locations = JSON.parse(locationsData)
+          localStorage.removeItem(locations)
+  
+        }
+        if (usersData) {
+          const users = JSON.parse(usersData); // Converte os dados em um array de objetos
+          const updatedUsers = users.filter((user: { login: string }) => user.login !== loggedUser?.login); // Remove o usuário atual
+          // Atualiza o localStorage com os usuários restantes
+          localStorage.setItem('users', JSON.stringify(updatedUsers));
+  
+          if (updatedUsers.length < users.length) {
+            alert('Conta excluída com sucesso!');
+            logOut(); // Redireciona para logout (função no AuthContext)
+          } else {
+            alert('Erro ao excluir a conta.');
+          }
+        }
+      }
+    }
     return (
-        <AuthContext.Provider value={{ signIn, signUp, loggedUser, logOut }}>
+        <AuthContext.Provider value={{ signIn, signUp, loggedUser, logOut, deleteAccount }}>
             {children}
         </AuthContext.Provider>
     )

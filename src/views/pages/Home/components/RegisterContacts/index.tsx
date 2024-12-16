@@ -26,7 +26,7 @@ interface RegisterActionProp {
   handleAddressChange: (newCoordinates: {
     latitude: number;
     longitude: number;
-}) => void
+  }) => void
 }
 
 interface RegisterAddressForm {
@@ -44,6 +44,8 @@ interface RegisterAddressForm {
 }
 
 export const RegisterAddressForm = ({ handleAddressChange }: RegisterActionProp) => {
+  const { loggedUser, logOut, deleteAccount } = useContext(AuthContext);
+
   const [formData, setFormData] = useState<RegisterAddressForm>({
     name: '',
     cpf: '',
@@ -64,15 +66,12 @@ export const RegisterAddressForm = ({ handleAddressChange }: RegisterActionProp)
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [openDialog, setOpenDialog] = useState<boolean>()
-  const { loggedUser, logOut } = useContext(AuthContext);
 
   const [isSearchByAddress, setIsSeachByAddress] = useState(false);
   const [isSearchByCep, setSearchByCep] = useState(false);
 
   // Estado da aba ativa
   const [activeTab, setActiveTab] = useState(0);
-
-
 
   // Carregar endereços do localStorage no carregamento inicial
   useEffect(() => {
@@ -83,17 +82,17 @@ export const RegisterAddressForm = ({ handleAddressChange }: RegisterActionProp)
   }, []);
 
 
-    // Handlers para alternar os checkboxes
-    const handleFetchByAdressChange = () => {
-      setIsSeachByAddress((prevState) => !prevState);
-      setSearchByCep(false); // Desmarca o outro
-    };
-  
-    const handleCepChange = () => {
-      setIsSeachByAddress(false); // Desmarca o outro
-      setSearchByCep((prevState) => !prevState);
-    };
-  
+  // Handlers para alternar os checkboxes
+  const handleFetchByAdressChange = () => {
+    setIsSeachByAddress((prevState) => !prevState);
+    setSearchByCep(false); // Desmarca o outro
+  };
+
+  const handleCepChange = () => {
+    setIsSeachByAddress(false); // Desmarca o outro
+    setSearchByCep((prevState) => !prevState);
+  };
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -163,20 +162,20 @@ export const RegisterAddressForm = ({ handleAddressChange }: RegisterActionProp)
       alert('Todos os campos obrigatórios devem ser preenchidos (exceto complemento).');
       return;
     }
-  
+
     // Validação de CPF
     if (!cpfValidator(formData.cpf)) {
       alert('CPF inválido. Por favor, insira um CPF válido.');
       return;
     }
-  
+
     // Verifica se o CPF já existe na base
     const cpfExists = addresses.some((address) => address.cpf === formData.cpf && editingIndex === null);
     if (cpfExists) {
       alert('CPF já cadastrado. Por favor, insira um CPF diferente.');
       return;
     }
-  
+
     let updatedAddresses;
     if (editingIndex !== null) {
       // Atualiza o contato em edição
@@ -188,12 +187,12 @@ export const RegisterAddressForm = ({ handleAddressChange }: RegisterActionProp)
       // Adiciona um novo contato
       updatedAddresses = [...addresses, formData];
     }
-  
+
     setAddresses(updatedAddresses);
-  
+
     // Salva o contato editado/novo com o usuário logado
     localStorage.setItem(`${loggedUser?.login}-addressList`, JSON.stringify(updatedAddresses));
-  
+
     // Reseta o formulário
     setFormData({
       name: '',
@@ -208,7 +207,7 @@ export const RegisterAddressForm = ({ handleAddressChange }: RegisterActionProp)
       latitude: 0,
       longitude: 0,
     });
-  
+
     alert(editingIndex !== null ? 'Contato atualizado com sucesso!' : 'Contato salvo com sucesso!');
   };
 
@@ -244,35 +243,11 @@ export const RegisterAddressForm = ({ handleAddressChange }: RegisterActionProp)
   };
 
   const handleDeleteAccount = () => {
-    // Confirmação antes de deletar
-    if (window.confirm('Tem certeza de que deseja excluir sua conta?')) {
-      // Obter lista de usuários do localStorage
-      const usersData = localStorage.getItem('users');
-      const locationsData = localStorage.getItem(`${loggedUser?.login}-addressList`)
-      //Removendo localizações caso exista
-      if (locationsData) {
-        const locations = JSON.parse(locationsData)
-        localStorage.removeItem(locations)
-
-      }
-      if (usersData) {
-        const users = JSON.parse(usersData); // Converte os dados em um array de objetos
-        const updatedUsers = users.filter((user: { login: string }) => user.login !== loggedUser?.login); // Remove o usuário atual
-        // Atualiza o localStorage com os usuários restantes
-        localStorage.setItem('users', JSON.stringify(updatedUsers));
-
-        if (updatedUsers.length < users.length) {
-          alert('Conta excluída com sucesso!');
-          logOut(); // Redireciona para logout (função no AuthContext)
-        } else {
-          alert('Erro ao excluir a conta.');
-        }
-      }
-    }
+    deleteAccount()
   };
 
   const handleLogout = () => {
-    logOut(); // Assume que essa função está no contexto
+    logOut(); 
   };
 
   return (
@@ -339,19 +314,19 @@ export const RegisterAddressForm = ({ handleAddressChange }: RegisterActionProp)
               helperText={error}
             />
             <Stack flexDirection='row' alignItems='center'>
-             <Checkbox 
-              checked={isSearchByAddress}
-              onChange={handleFetchByAdressChange}
-             />
-             <Typography>Buscar por logradouro</Typography>
+              <Checkbox
+                checked={isSearchByAddress}
+                onChange={handleFetchByAdressChange}
+              />
+              <Typography>Buscar por logradouro</Typography>
             </Stack>
 
             <Stack flexDirection='row' alignItems='center'>
-             <Checkbox 
-               checked={isSearchByCep}
-               onChange={handleCepChange}
-             />
-             <Typography>Buscar por CEP</Typography>
+              <Checkbox
+                checked={isSearchByCep}
+                onChange={handleCepChange}
+              />
+              <Typography>Buscar por CEP</Typography>
             </Stack>
 
             <Button variant="contained" onClick={isSearchByCep ? handleCepFetch : handleFetchByParams}>
@@ -501,18 +476,18 @@ export const RegisterAddressForm = ({ handleAddressChange }: RegisterActionProp)
       >
         <DialogTitle>Endereços encontrados</DialogTitle>
         <DialogContent>
-        <Grid item xs={12}>
+          <Grid item xs={12}>
             <Typography variant="h6">Resultados da busca:</Typography>
             <List
-                 sx={{
-                  width: '100%',
-                  maxWidth: 360,
-                  bgcolor: 'background.paper',
-                  position: 'relative',
-                  overflow: 'auto',
-                  maxHeight: 300,
-                  '& ul': { padding: 0 },
-                }}
+              sx={{
+                width: '100%',
+                maxWidth: 360,
+                bgcolor: 'background.paper',
+                position: 'relative',
+                overflow: 'auto',
+                maxHeight: 300,
+                '& ul': { padding: 0 },
+              }}
             >
               {searchResults.map((address, index) => (
                 <ListItem
