@@ -45,9 +45,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         getUsers()
     },[])
     
-    function signIn({login}: UserCredentials) {
+    function signIn({login, password}: UserCredentials) {
         const findedUser = users?.find((item: {login: string, password: string}) => {
-            return item.login === login
+            const userAsValidates = [item.login === login, item.password === password].every(Boolean)
+            return userAsValidates
         })
 
         findedUser.isAuthenticated = true

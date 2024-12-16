@@ -1,11 +1,12 @@
-import { useState } from "react";
-import { Box, Button, Grid, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Box,  Grid } from "@mui/material";
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api'
+import { RegisterAddressForm } from "./components/RegisterContacts";
 
 
 const containerStyle = {
     width: '100%',
-    height: '95vh',
+    height: '90vh',
 }
 
 const center = {
@@ -17,37 +18,15 @@ interface Marker {
     lat: number;
     lng: number;
 }
-
 export function Home() {
-    const { isLoaded, loadError } = useJsApiLoader({
-        googleMapsApiKey: 'AIzaSyA4pbbv8wwJ-r4MhFNZpUU-h0mVbGrX8Rk',
+    const { isLoaded, loadError } = useJsApiLoader({ 
+        googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY,
         libraries: ['places']
     })
-    const [coords, setCoords] = useState({});
-    const [distance, setDistance] = useState(0);
-    const [markers, setMarkers] = useState<Marker[]>([])
-
-    const onMapClick = (e) => {
-        setMarkers((prevState) => [
-            ...prevState,
-            {
-                lat: e.latLng.lat(),
-                lng: e.latLng.lng()
-            }
-        ]);
-    };
-
-    const handleLocation = () => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((position) => {
-
-                const { latitude, longitude, accuracy } = position.coords;
-
-                setCoords({ lat: latitude, lng: longitude });
-                setDistance(accuracy);
-            });
-        }
-    };
+    const [addressLatAndLong, setAddressLatAndLong] = useState({
+        latitude: 0,
+        longitude: 0
+    })
 
     if (loadError) {
         return <div>Error loading maps</div>;
@@ -59,70 +38,41 @@ export function Home() {
         <Box
             sx={{
                 width: '100%',
-                height: '100vh',
+                height: '95vh',
                 border: '1px solid black',
                 display: 'flex',
                 flexDirection: 'column',
             }}
         >
-            {/* Cabeçalho */}
-            <Box sx={{ display: 'flex', borderBottom: '1px solid black' }}>
-                <Box
-                    sx={{
-                        width: '50%',
-                        textAlign: 'center',
-                        borderRight: '1px solid black',
-                    }}
-                >
-                    <Typography
-                        variant="subtitle1"
-                        fontWeight="bold"
-                        sx={{ padding: 1 }}
-                    >
-                        Contatos
-                    </Typography>
-                </Box>
-                <Box sx={{ width: '50%', textAlign: 'center' }}>
-                    <Typography
-                        variant="subtitle1"
-                        fontWeight="bold"
-                        sx={{ padding: 1 }}
-                    >
-                        Mapa
-                    </Typography>
-                </Box>
-            </Box>
-
             {/* Conteúdo com duas colunas */}
             <Grid container sx={{ flex: 1 }}>
                 {/* Coluna Esquerda - Contatos */}
                 <Grid
                     item
-                    xs={2}
+                    xs={4}
                     sx={{
                         borderRight: '1px solid black',
                     }}
                 >
-                    <Button onClick={handleLocation}> Teste</Button>
+                    <RegisterAddressForm setAddressLatAndLong={setAddressLatAndLong} />
                 </Grid>
 
                 {/* Coluna Direita - Mapa */}
-                <Grid item xs={10}>
+                <Grid item xs={8}>
                     {isLoaded && (
                         <GoogleMap
                             mapContainerStyle={containerStyle}
                             center={center}
                             zoom={6}
-                            onClick={onMapClick}
                         >
                             {/* Pontos marcados no mapa */}
-                            {markers.map((marker) => (
-                                <Marker
-                                    position={{
-                                        lat: marker.lat,
-                                        lng: marker.lng
-                                    }} />
-                            ))}
+                               {addressLatAndLong.latitude && (
+                                 <Marker
+                                 position={{
+                                     lat: addressLatAndLong.latitude,
+                                     lng: addressLatAndLong.longitude
+                                 }} />
+                               )}
                         </GoogleMap>)}
                 </Grid>
             </Grid>
