@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Box,  Grid } from "@mui/material";
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api'
 import { RegisterAddressForm } from "./components/RegisterContacts";
@@ -23,7 +23,21 @@ export function Home() {
         latitude: 0,
         longitude: 0
     })
+    const mapRef = useRef<google.maps.Map | null>(null);
 
+    const onMapLoad = (map: google.maps.Map) => {
+        mapRef.current = map; // Salva a instância do mapa na ref
+    };
+
+    const handleAddressChange = (newCoordinates: { latitude: number; longitude: number }) => {
+        setAddressLatAndLong(newCoordinates);
+        if (mapRef.current) {
+            mapRef.current.panTo({
+                lat: newCoordinates.latitude,
+                lng: newCoordinates.longitude
+            });
+        }
+    };
     if (loadError) {
         return <div>Error loading maps</div>;
     }
@@ -50,7 +64,7 @@ export function Home() {
                         borderRight: '1px solid black',
                     }}
                 >
-                    <RegisterAddressForm setAddressLatAndLong={setAddressLatAndLong} />
+                    <RegisterAddressForm handleAddressChange={handleAddressChange} />
                 </Grid>
 
                 {/* Coluna Direita - Mapa */}
@@ -58,6 +72,7 @@ export function Home() {
                     {isLoaded && (
                         <GoogleMap
                             mapContainerStyle={containerStyle}
+                            onLoad={onMapLoad}
                             center={center}
                             zoom={6}
                             
@@ -65,7 +80,6 @@ export function Home() {
                             {/* Pontos marcados no mapa */}
                                {addressLatAndLong.latitude && (
                                  <Marker
-
                                  position={{
                                      lat: addressLatAndLong.latitude,
                                      lng: addressLatAndLong.longitude

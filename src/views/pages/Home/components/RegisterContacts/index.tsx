@@ -21,12 +21,10 @@ import { fetchAddressByCep, fetchAddressesByParams, fetchGeocode } from '../../.
 import { AuthContext } from '../../../../../app/context/AuthProvider';
 
 interface RegisterActionProp {
-  setAddressLatAndLong: React.Dispatch<
-    React.SetStateAction<{
-      latitude: number;
-      longitude: number;
-    }>
-  >;
+  handleAddressChange: (newCoordinates: {
+    latitude: number;
+    longitude: number;
+}) => void
 }
 
 interface RegisterAddressForm {
@@ -43,7 +41,7 @@ interface RegisterAddressForm {
   longitude: number;
 }
 
-export const RegisterAddressForm = ({ setAddressLatAndLong }: RegisterActionProp) => {
+export const RegisterAddressForm = ({ handleAddressChange }: RegisterActionProp) => {
   const [formData, setFormData] = useState<RegisterAddressForm>({
     name: '',
     cpf: '',
@@ -111,7 +109,7 @@ export const RegisterAddressForm = ({ setAddressLatAndLong }: RegisterActionProp
       const address = await fetchAddressByCep(formattedCep);
       // Busca latitude / longitude google
       const { lat: latitude, lng: longitude } = await fetchGeocode(`${address.logradouro}, ${address.uf}`);
-      setAddressLatAndLong({
+      handleAddressChange({
         latitude,
         longitude,
       });
@@ -206,7 +204,7 @@ export const RegisterAddressForm = ({ setAddressLatAndLong }: RegisterActionProp
 
   const handleShowOnMap = (address: RegisterAddressForm) => {
     const { latitude, longitude } = address;
-    setAddressLatAndLong({
+    handleAddressChange({
       latitude,
       longitude,
     });
