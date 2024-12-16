@@ -1,4 +1,5 @@
 import {useContext, useState} from 'react'
+import { useNavigate } from 'react-router';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -19,6 +20,7 @@ export  function SignUp() {
   const [login, setLogin] = useState('')
   const [password, setPassword] = useState('')
   const { signIn, signUp } = useContext(AuthContext)
+  const navigate = useNavigate()
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     if (emailError || passwordError) {
@@ -124,6 +126,14 @@ export  function SignUp() {
               onClick={validateInputs}
             >
               Sign Up
+            </Button>
+
+            <Button
+              fullWidth
+              variant="text"
+              onClick={() => navigate("/")}
+            >
+              Return to Login
             </Button>
           </Box>
         </Card>
