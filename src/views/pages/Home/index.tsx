@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Box,  Grid } from "@mui/material";
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api'
 import { RegisterAddressForm } from "./components/RegisterContacts";
@@ -14,10 +14,6 @@ const center = {
     lng: -38.523,
 }
 
-interface Marker {
-    lat: number;
-    lng: number;
-}
 export function Home() {
     const { isLoaded, loadError } = useJsApiLoader({ 
         googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY,
@@ -64,10 +60,12 @@ export function Home() {
                             mapContainerStyle={containerStyle}
                             center={center}
                             zoom={6}
+                            
                         >
                             {/* Pontos marcados no mapa */}
                                {addressLatAndLong.latitude && (
                                  <Marker
+
                                  position={{
                                      lat: addressLatAndLong.latitude,
                                      lng: addressLatAndLong.longitude
