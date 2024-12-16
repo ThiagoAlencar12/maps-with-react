@@ -79,8 +79,9 @@ export const RegisterAddressForm = ({ setAddressLatAndLong }: RegisterActionProp
         setError('CEP inválido. Deve conter 8 dígitos.');
         return;
       }
-
+      // Busca na API Via CEP
       const address = await fetchAddressByCep(formattedCep);
+      // Busca latitude / longitude google
       const { lat: latitude, lng: longitude } = await fetchGeocode(`${address.logradouro}, ${address.uf}`);
       setAddressLatAndLong({
         latitude,
@@ -117,6 +118,8 @@ export const RegisterAddressForm = ({ setAddressLatAndLong }: RegisterActionProp
     }
 
     setAddresses(updatedAddresses);
+
+    //Salva o contato editado/novo com o usuario logado
     localStorage.setItem(`${loggedUser?.login}-addressList`, JSON.stringify(updatedAddresses));
 
     setFormData({
@@ -166,11 +169,33 @@ export const RegisterAddressForm = ({ setAddressLatAndLong }: RegisterActionProp
     setSearchTerm(e.target.value); // Atualiza o termo de busca
   };
 
-  // const handleDeleteAccount = () => {
-  //   if (window.confirm('Tem certeza de que deseja excluir sua conta?')) {
-  //     deleteAccount(); // Assume que essa função está no contexto
-  //   }
-  // };
+  const handleDeleteAccount = () => {
+    // Confirmação antes de deletar
+    if (window.confirm('Tem certeza de que deseja excluir sua conta?')) {
+      // Obter lista de usuários do localStorage
+      const usersData = localStorage.getItem('users');
+      const locationsData = localStorage.getItem(`${loggedUser?.login}-addressList`)
+      //Removendo localizações caso exista
+      if (locationsData) {
+        const locations = JSON.parse(locationsData)
+        localStorage.removeItem(locations)
+
+      }
+      if (usersData) {
+        const users = JSON.parse(usersData); // Converte os dados em um array de objetos
+        const updatedUsers = users.filter((user: { login: string }) => user.login !== loggedUser?.login); // Remove o usuário atual
+        // Atualiza o localStorage com os usuários restantes
+        localStorage.setItem('users', JSON.stringify(updatedUsers));
+
+        if (updatedUsers.length < users.length) {
+          alert('Conta excluída com sucesso!');
+          logOut(); // Redireciona para logout (função no AuthContext)
+        } else {
+          alert('Erro ao excluir a conta.');
+        }
+      }
+    }
+  };
 
   const handleLogout = () => {
     logOut(); // Assume que essa função está no contexto
@@ -364,7 +389,7 @@ export const RegisterAddressForm = ({ setAddressLatAndLong }: RegisterActionProp
             <Typography variant="h6">Configurações</Typography>
           </Grid>
           <Grid item xs={12}>
-            <Button variant="contained" color="error" onClick={() => console.log('aqui')}>
+            <Button variant="contained" color="error" onClick={handleDeleteAccount}>
               Excluir Conta
             </Button>
           </Grid>
