@@ -76,7 +76,7 @@ src/
 
 ## Contact
 
-For any inquiries, reach out to the project maintainer at [Email](thiagofalencar12@gmail.com).
+For any inquiries, reach out to the project maintainer at thiagofalencar12@gmail.com.
 
 ## Exemples
 ![alt text](image.png)
