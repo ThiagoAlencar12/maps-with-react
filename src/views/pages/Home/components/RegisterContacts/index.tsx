@@ -70,10 +70,8 @@ export const RegisterAddressForm = ({ handleAddressChange }: RegisterActionProp)
   const [isSearchByAddress, setIsSeachByAddress] = useState(false);
   const [isSearchByCep, setSearchByCep] = useState(false);
 
-  // Estado da aba ativa
   const [activeTab, setActiveTab] = useState(0);
 
-  // Carregar endereços do localStorage no carregamento inicial
   useEffect(() => {
     const savedAddresses = localStorage.getItem(`${loggedUser?.login}-addressList`);
     if (savedAddresses) {
@@ -82,14 +80,13 @@ export const RegisterAddressForm = ({ handleAddressChange }: RegisterActionProp)
   }, []);
 
 
-  // Handlers para alternar os checkboxes
   const handleFetchByAdressChange = () => {
     setIsSeachByAddress((prevState) => !prevState);
-    setSearchByCep(false); // Desmarca o outro
+    setSearchByCep(false); 
   };
 
   const handleCepChange = () => {
-    setIsSeachByAddress(false); // Desmarca o outro
+    setIsSeachByAddress(false); 
     setSearchByCep((prevState) => !prevState);
   };
 
@@ -106,9 +103,9 @@ export const RegisterAddressForm = ({ handleAddressChange }: RegisterActionProp)
         setError('CEP inválido. Deve conter 8 dígitos.');
         return;
       }
-      // Busca na API Via CEP
+  
       const address = await fetchAddressByCep(formattedCep);
-      // Busca latitude / longitude google
+     
       const { lat: latitude, lng: longitude } = await fetchGeocode(`${address.logradouro}, ${address.uf}`);
       handleAddressChange({
         latitude,
@@ -134,7 +131,7 @@ export const RegisterAddressForm = ({ handleAddressChange }: RegisterActionProp)
   const handleFetchByParams = async () => {
     try {
       const results = await fetchAddressesByParams(formData.uf, formData.localidade, formData.logradouro);
-      setSearchResults(results); // Armazena os resultados no estado
+      setSearchResults(results);
       setOpenDialog(true)
     } catch (error) {
       console.error('Erro ao buscar endereços:', error);
@@ -142,7 +139,7 @@ export const RegisterAddressForm = ({ handleAddressChange }: RegisterActionProp)
   };
 
   const handleSelectAddress = (address: RegisterAddressForm) => {
-    // Preenche os campos do formulário com os dados do endereço selecionado
+    
     setFormData((prev) => ({
       ...prev,
       cep: address.cep,

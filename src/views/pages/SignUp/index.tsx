@@ -1,4 +1,4 @@
-import {useContext, useState} from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -7,11 +7,12 @@ import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-
 import { Card, SignInContainer } from './styles'
-import { AuthContext } from '../../../app/context/AuthProvider';
+import { useAppDispatch } from '../../../app/context/store';
+import { signUp } from '../../../app/context/store/slices/sessionSlice';
 
 export  function SignUp() {
+  const dispatch = useAppDispatch()
   const [emailError, setEmailError] = useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = useState('');
   const [passwordError, setPasswordError] = useState(false);
@@ -19,18 +20,19 @@ export  function SignUp() {
 
   const [login, setLogin] = useState('')
   const [password, setPassword] = useState('')
-  const { signIn, signUp } = useContext(AuthContext)
+  
   const navigate = useNavigate()
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (emailError || passwordError) {
       return;
     }
-    signUp({
+    const userCredentials = {
       login,
       password
-    })
-    
+    }
+     dispatch(signUp(userCredentials))
   };
 
   const validateInputs = () => {

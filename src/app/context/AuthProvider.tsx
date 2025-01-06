@@ -8,13 +8,12 @@ type UserCredentials = {
 }
 
 type AuthContextProps = {
-    signIn(credentials: UserCredentials): void
-    signUp(credentials: UserCredentials): void
-    logOut(): void
-    deleteAccount(): void
-
-    loggedUser?: UserCredentials
-}
+    signIn(credentials: UserCredentials): void;
+    signUp(credentials: UserCredentials): void;
+    logOut(): void;
+    deleteAccount(): void;
+    loggedUser?: UserCredentials;
+  };
 
 export const AuthContext = createContext({} as AuthContextProps) 
 
