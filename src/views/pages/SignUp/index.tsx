@@ -32,7 +32,12 @@ export  function SignUp() {
       login,
       password
     }
-     dispatch(signUp(userCredentials))
+     try {
+      dispatch(signUp(userCredentials))
+      navigate('/')
+     } catch (e) {
+      alert('Error signing up')
+     }
   };
 
   const validateInputs = () => {
