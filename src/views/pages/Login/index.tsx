@@ -1,15 +1,15 @@
-import { useState, useContext } from 'react'
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
-import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { useContext, useState } from 'react';
 
-import { Card, SignInContainer } from './styles'
+import { useNavigate } from 'react-router';
 import { AuthContext } from '../../../app/context/AuthProvider';
-import { useNavigate } from 'react-router'
+import { Card, SignInContainer } from './styles';
 
 export  function Login() {
   const navigate = useNavigate()

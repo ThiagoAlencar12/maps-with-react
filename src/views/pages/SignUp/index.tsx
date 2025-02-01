@@ -1,15 +1,15 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
-import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { Card, SignInContainer } from './styles'
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { useAppDispatch } from '../../../app/context/store';
 import { signUp } from '../../../app/context/store/slices/sessionSlice';
+import { Card, SignInContainer } from './styles';
 
 export  function SignUp() {
   const dispatch = useAppDispatch()

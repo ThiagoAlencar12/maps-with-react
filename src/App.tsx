@@ -1,10 +1,11 @@
-import {BrowserRouter} from 'react-router'
-import {Provider} from 'react-redux'
-import { InitialRouter } from './app/Router/Initial.route'
+import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline'
-import theme from './views/style/theme'
+import { Provider } from 'react-redux';
+import { InitialRouter } from './app/router/Initial.route';
+
+import { BrowserRouter } from 'react-router';
 import { store } from './app/context/store';
+import theme from "./views/style/theme";
 export function App() {
   return (
   <ThemeProvider theme={theme}>
